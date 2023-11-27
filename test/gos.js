@@ -6,8 +6,8 @@ const {
     time
 } = require('@openzeppelin/test-helpers');
 
-const amount = 10_000;
-const totalSupply = 20_000_000;
+const amount = 10_000 * 1e2;
+const totalSupply = 200_000 * 1e2;
 let holder;
 let deployer;
 
@@ -36,12 +36,12 @@ contract('Gos', function (accounts) {
 
         assert.equal(totalTokens, totalSupply, 'total supply should be 200K tokens');
 
-        let tx = await gos.topUpGame(amount - 1_000, {from: holder});
+        let tx = await gos.topUpGame(amount - 1_000 * 1e2, {from: holder});
         let checkTime = (await time.latest()).toNumber();
 
         await expectEvent(tx, 'TopUpGameBalance', {
             user: holder,
-            amount: web3.utils.toBN(amount - 1_000),
+            amount: web3.utils.toBN(amount - 1_000 * 1e2),
             time: web3.utils.toBN(checkTime),
         });
 
@@ -49,9 +49,9 @@ contract('Gos', function (accounts) {
         let deployerBalance = await gos.balanceOf(deployer);
         let holderBalance = await gos.balanceOf(holder);
 
-        assert.equal(totalTokens, totalSupply - 9_000, 'total supply should be 200K minus 9K tokens');
-        assert.equal(deployerBalance, totalSupply - amount, 'deployer should have 200K tokens');
-        assert.equal(holderBalance, amount - 9_000, 'holder should have 1K tokens');
+        assert.equal(totalTokens, totalSupply - 9_000 * 1e2, 'total supply should be 200K minus 9K tokens');
+        assert.equal(deployerBalance, totalSupply - amount, 'deployer should have 200K minus 10K tokens');
+        assert.equal(holderBalance, amount - 9_000 * 1e2, 'holder should have 1K tokens');
     });
 
     it('should withdraw balance (mint) tokens for holder', async function () {
