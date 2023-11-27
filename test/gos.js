@@ -36,10 +36,10 @@ contract('Gos', function (accounts) {
 
         assert.equal(totalTokens, totalSupply, 'total supply should be 200K tokens');
 
-        let tx = await gos.topUp(holder, amount - 1_000);
+        let tx = await gos.topUpGame(amount - 1_000, {from: holder});
         let checkTime = (await time.latest()).toNumber();
 
-        await expectEvent(tx, 'TopUpBalance', {
+        await expectEvent(tx, 'TopUpGameBalance', {
             user: holder,
             amount: web3.utils.toBN(amount - 1_000),
             time: web3.utils.toBN(checkTime),
@@ -55,14 +55,14 @@ contract('Gos', function (accounts) {
     });
 
     it('should withdraw balance (mint) tokens for holder', async function () {
-        let tx = await gos.withdraw(holder, amount);
+        let tx = await gos.withdrawGame(holder, amount);
         let checkTime = (await time.latest()).toNumber();
 
         let totalTokens = await gos.totalSupply();
         let deployerBalance = await gos.balanceOf(deployer);
         let holderBalance = await gos.balanceOf(holder);
 
-        await expectEvent(tx, 'WithdrawBalance', {
+        await expectEvent(tx, 'WithdrawGameBalance', {
             user: holder,
             amount: web3.utils.toBN(amount),
             time: web3.utils.toBN(checkTime),
@@ -92,29 +92,11 @@ contract('Gos', function (accounts) {
         assert.equal(holderBalance, 0, 'holder should have 0 tokens');
     });
 
-    it('revert top up tokens (burn) tokens if not owner', async function () {
-        await gos.transfer(holder, amount);
-
-        let totalTokens = await gos.totalSupply();
-
-        assert.equal(totalTokens, totalSupply, 'total supply should be 200K tokens');
-
-        await expectRevert(
-            gos.topUp(holder, amount - 1_000, {from: holder}),
-            'Ownable: caller is not the owner');
-
-        let totalTokensAfterRevert = await gos.totalSupply();
-
-        assert.equal(totalTokens.toNumber(),
-            totalTokensAfterRevert.toNumber(),
-            'total supply should be 200K tokens');
-    });
-
     it('revert withdraw tokens (mint) tokens if not owner', async function () {
         let totalTokens = await gos.totalSupply();
 
         await expectRevert(
-            gos.withdraw(holder, amount, {from: holder}),
+            gos.withdrawGame(holder, amount, {from: holder}),
             'Ownable: caller is not the owner');
 
         let totalTokensAfterRevert = await gos.totalSupply();

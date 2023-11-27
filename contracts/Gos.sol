@@ -6,8 +6,8 @@ import "./Ownable.sol";
 
 contract Gos is ERC20, Ownable {
 
-  event TopUpBalance(address user, uint amount, uint time);
-  event WithdrawBalance(address user, uint amount, uint time);
+  event TopUpGameBalance(address user, uint amount, uint time);
+  event WithdrawGameBalance(address user, uint amount, uint time);
   event DappFee(address to, uint amount, uint time);
 
   constructor() payable ERC20('Game of Sana', 'GOS') {
@@ -18,14 +18,14 @@ contract Gos is ERC20, Ownable {
     return 2;
   }
 
-  function topUp(address _from, uint _amount) public onlyOwner {
-    _burn(_from, _amount);
-    emit TopUpBalance(_from, _amount, block.timestamp);
+  function topUpGame(uint _amount) public {
+    _burn(msg.sender, _amount);
+    emit TopUpGameBalance(msg.sender, _amount, block.timestamp);
   }
 
-  function withdraw(address _to, uint _amount) public onlyOwner {
+  function withdrawGame(address _to, uint _amount) public onlyOwner {
     _mint(_to, _amount);
-    emit WithdrawBalance(_to, _amount, block.timestamp);
+    emit WithdrawGameBalance(_to, _amount, block.timestamp);
   }
 
   function dappFee(address _to, uint _amount) public onlyOwner {
